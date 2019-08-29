@@ -4,7 +4,8 @@
             [io.pedestal.http :as bootstrap]
             [kargo-api.service :as service]
             [kargo-api.main :as main]
-            [kargo-api.logic :as logic]))
+            [kargo-api.logic :as logic]
+            [cheshire.core :as che]))
 
  (def service
    (::bootstrap/service-fn (bootstrap/create-servlet main/service-map)))
@@ -86,10 +87,10 @@
   (is (let [response (response-for service :get "/bid/1/sort-by/price")
             status (:status response)
             body (:body response)]
-        (and (= status 200) (= body (str sorted-bid-by-price))))))
+        (and (= status 200) (= body (che/generate-string sorted-bid-by-price))))))
 
 (deftest job-sort-api
   (is (let [response (response-for service :get "/job/sort-by/budget")
             status (:status response)
             body (:body response)]
-        (and (= status 200) (= body (str sorted-job-by-budget))))))
+        (and (= status 200) (= body (che/generate-string sorted-job-by-budget))))))

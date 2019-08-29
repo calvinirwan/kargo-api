@@ -4,7 +4,8 @@
             [io.pedestal.test :as test]
             [clojure.pprint :as pprint]
             [kargo-api.logic :as logic]
-            [clj-time.core :as t]))
+            [clj-time.core :as t]
+            [cheshire.core :as che]))
 
 (defn response
   [status body & {:as headers}]
@@ -103,11 +104,12 @@
            job-id (read-string (:job-id params))
            key (keyword (:key params))
            bids (:bids db)
-           job-by-id (filter #(= job-id (-> % val :jobs-id)) bids)
-           job-by-id (mapv val job-by-id)
-           sorted-job-by-key (logic/bubble-sort-key job-by-id key)
-           _ (reset! a [job-by-id ])
-           response (ok sorted-job-by-key)]
+           bid-by-job-id (filter #(= job-id (-> % val :jobs-id)) bids)
+           bid-by-job-id (mapv val bid-by-job-id)
+           sorted-bid-by-key (logic/bubble-sort-key bid-by-job-id key)
+           json-sorted-bid-by-key (che/generate-string sorted-bid-by-key)
+           ;;_ (reset! a [job-by-id ])
+           response (ok json-sorted-bid-by-key)]
        (assoc ctx :response response)))})
 
 
@@ -122,8 +124,9 @@
            jobs (:jobs db)
            jobs (mapv val jobs)
            sorted-job-by-key (logic/bubble-sort-key jobs key)
-           _ (reset! a sorted-job-by-key)
-           response (ok sorted-job-by-key)]
+           json-sorted-job-by-key (che/generate-string sorted-job-by-key)
+           ;;_ (reset! a sorted-job-by-key)
+           response (ok json-sorted-job-by-key)]
        (assoc ctx :response response)))})
 
 (def routes
